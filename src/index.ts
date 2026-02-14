@@ -7,8 +7,8 @@ const HEARTBEAT_INTERVAL = 5 * MINUTE;
 
 const isBlackoutWindow = (): boolean => {
   const m = new Date().getMinutes();
-  // :56-:02 and :26-:32 — let the volume bot use the API
-  return (m >= 56 || m <= 2) || (m >= 26 && m <= 32);
+  // :56-:00 and :26-:30 — let the volume bot use the API
+  return (m >= 56) || (m >= 26 && m <= 30);
 };
 
 const schedule = () => {
