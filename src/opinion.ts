@@ -475,7 +475,9 @@ interface RawMarket {
   totalPrice?: number | string;
   total_price?: number | string;
   cutoffAt?: number | string;
+  cutoffTime?: number | string;
   resolvedAt?: number | string;
+  resolvedTime?: number | string;
   createdAt?: number | string;
 }
 
@@ -500,11 +502,11 @@ const asTimestampMs = (value: number | string | undefined): number | null => {
 };
 
 const isActiveByTime = (input: RawMarket, nowMs: number): boolean => {
-  const resolvedAtMs = asTimestampMs(input.resolvedAt);
+  const resolvedAtMs = asTimestampMs(input.resolvedAt ?? input.resolvedTime);
   if (resolvedAtMs && resolvedAtMs > 0 && resolvedAtMs <= nowMs) {
     return false;
   }
-  const cutoffAtMs = asTimestampMs(input.cutoffAt);
+  const cutoffAtMs = asTimestampMs(input.cutoffAt ?? input.cutoffTime);
   if (cutoffAtMs && cutoffAtMs <= nowMs) {
     return false;
   }
@@ -542,7 +544,7 @@ const normalize = (
         : Number(input.topicType)
       : Number(input.marketType);
   const chainIdValue = input.chainId === undefined ? undefined : Number(input.chainId);
-  const cutoffAtMs = asTimestampMs(input.cutoffAt);
+  const cutoffAtMs = asTimestampMs(input.cutoffAt ?? input.cutoffTime);
   return {
     marketId: Number(marketIdValue),
     yesTokenId: yesTokenValue ? String(yesTokenValue) : `multi-parent-${marketIdValue}`,
