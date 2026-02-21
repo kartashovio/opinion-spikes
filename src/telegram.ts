@@ -78,20 +78,15 @@ const formatMessage = (
   // Build market title as clickable link
   // For child markets: "Parent Title → Child Title" (entire string is one link)
   // For solo/parent markets: just the title
-  let marketLine: string;
+  let titleText: string;
   if (stream.parentMarketId) {
     const parent = storage.getStreamById(stream.parentMarketId);
-    // Validate parent is on same chain (topicId can be reused across chains)
     const isValidParent = parent && parent.chainId === stream.chainId;
-    if (isValidParent) {
-      const fullTitle = `${parent.title} → ${stream.title}`;
-      marketLine = `Market: <a href="${url}">${escapeHtml(fullTitle)}</a>`;
-    } else {
-      // Parent not found or on different chain - show child title only
-      marketLine = `Market: <a href="${url}">${escapeHtml(stream.title)}</a>`;
-    }
+    titleText = isValidParent
+      ? `${parent.title} → ${stream.title}`
+      : stream.title;
   } else {
-    marketLine = `Market: <a href="${url}">${escapeHtml(stream.title)}</a>`;
+    titleText = stream.title;
   }
 
   const prevPricePercent = formatPriceAsPercent(detection.prevPrice);
@@ -99,13 +94,9 @@ const formatMessage = (
   const changePercent = formatPriceChangePercent(detection.prevPrice, tick.yesPrice);
 
   const lines = [
-    "🚨 Spike detected",
+    `🚨 Spike: <a href="${url}">${escapeHtml(titleText)}</a>`,
     "",
-    marketLine,
-    "",
-    `– Price change: ${prevPricePercent} → ${currentPricePercent} (${changePercent})`,
-    "",
-    "Please rate signal: Good / Noise",
+    `&gt; Price: ${prevPricePercent} → ${currentPricePercent} (${changePercent})`,
   ];
   return lines.join("\n");
 };

@@ -194,6 +194,8 @@ const isTitleBlocked = (title: string) => {
   return ALERT_TITLE_BLOCKLIST.some((entry) => normalized.includes(entry));
 };
 
+const MIN_TIME_TO_CUTOFF_MS = 60 * 60 * 1000; // 1 hour
+
 const isStreamBlocked = (stream: StreamRecord) => {
   if (isTitleBlocked(stream.title)) {
     return true;
@@ -203,6 +205,9 @@ const isStreamBlocked = (stream: StreamRecord) => {
     if (parent && isTitleBlocked(parent.title)) {
       return true;
     }
+  }
+  if (stream.cutoffAt && stream.cutoffAt - Date.now() < MIN_TIME_TO_CUTOFF_MS) {
+    return true;
   }
   return false;
 };

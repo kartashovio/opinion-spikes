@@ -146,7 +146,7 @@ export const buildMarketChart = async (ticks: TickRecord[]): Promise<ChartResult
     <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
       <rect width="100%" height="100%" fill="#161413"/>
 
-      <text x="${width / 2}" y="22" fill="#C9C2B8" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle">Beta / 2 last hours</text>
+      <text x="${width / 2}" y="22" fill="#C9C2B8" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle">Opinion / 2 last hours</text>
 
       ${gridY
         .map((ratio) => {

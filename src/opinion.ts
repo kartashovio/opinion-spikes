@@ -445,6 +445,7 @@ export interface MarketStream {
   topicId: string;
   marketType?: number;
   chainId?: number;
+  cutoffAt?: number;
 }
 
 interface RawMarket {
@@ -541,6 +542,7 @@ const normalize = (
         : Number(input.topicType)
       : Number(input.marketType);
   const chainIdValue = input.chainId === undefined ? undefined : Number(input.chainId);
+  const cutoffAtMs = asTimestampMs(input.cutoffAt);
   return {
     marketId: Number(marketIdValue),
     yesTokenId: yesTokenValue ? String(yesTokenValue) : `multi-parent-${marketIdValue}`,
@@ -549,6 +551,7 @@ const normalize = (
     topicId,
     marketType: hasChildren ? 1 : (Number.isFinite(marketTypeValue) ? marketTypeValue : undefined),
     chainId: Number.isFinite(chainIdValue) ? chainIdValue : undefined,
+    cutoffAt: cutoffAtMs ?? undefined,
   };
 };
 

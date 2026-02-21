@@ -81,6 +81,9 @@ if (!streamColumnNames.includes("marketType")) {
 if (!streamColumnNames.includes("chainId")) {
   db.exec("ALTER TABLE streams ADD COLUMN chainId INTEGER");
 }
+if (!streamColumnNames.includes("cutoffAt")) {
+  db.exec("ALTER TABLE streams ADD COLUMN cutoffAt INTEGER");
+}
 
 export interface StreamRecord {
   marketId: number;
@@ -90,6 +93,7 @@ export interface StreamRecord {
   topicId: string;
   marketType?: number;
   chainId?: number;
+  cutoffAt?: number;
   updatedAt: number;
 }
 
@@ -119,8 +123,8 @@ export interface EwmaState {
 
 
 const insertStream = db.prepare(`
-INSERT INTO streams (marketId, yesTokenId, title, parentMarketId, topicId, marketType, chainId, updatedAt)
-VALUES (@marketId, @yesTokenId, @title, @parentMarketId, @topicId, @marketType, @chainId, @updatedAt)
+INSERT INTO streams (marketId, yesTokenId, title, parentMarketId, topicId, marketType, chainId, cutoffAt, updatedAt)
+VALUES (@marketId, @yesTokenId, @title, @parentMarketId, @topicId, @marketType, @chainId, @cutoffAt, @updatedAt)
 ON CONFLICT(marketId) DO UPDATE SET
   yesTokenId=excluded.yesTokenId,
   title=excluded.title,
@@ -128,6 +132,7 @@ ON CONFLICT(marketId) DO UPDATE SET
   topicId=excluded.topicId,
   marketType=excluded.marketType,
   chainId=excluded.chainId,
+  cutoffAt=excluded.cutoffAt,
   updatedAt=excluded.updatedAt
 `);
 
@@ -209,18 +214,19 @@ type StreamRow = {
   topicId: string | null;
   marketType: number | null;
   chainId: number | null;
+  cutoffAt: number | null;
   updatedAt: number;
 };
 
 const getStreamByIdStmt = db.prepare<[number], StreamRow>(`
-SELECT marketId, yesTokenId, title, parentMarketId, topicId, marketType, chainId, updatedAt
+SELECT marketId, yesTokenId, title, parentMarketId, topicId, marketType, chainId, cutoffAt, updatedAt
 FROM streams
 WHERE marketId = ?
 LIMIT 1
 `);
 
 const getStreamsStmt = db.prepare<[], StreamRow>(`
-SELECT marketId, yesTokenId, title, parentMarketId, topicId, marketType, chainId, updatedAt
+SELECT marketId, yesTokenId, title, parentMarketId, topicId, marketType, chainId, cutoffAt, updatedAt
 FROM streams
 ORDER BY updatedAt DESC
 `);
@@ -287,6 +293,7 @@ export const storage = {
       topicId: row.topicId ?? "",
       marketType: row.marketType ?? undefined,
       chainId: row.chainId ?? undefined,
+      cutoffAt: row.cutoffAt ?? undefined,
       updatedAt: row.updatedAt,
     }));
   },
@@ -303,6 +310,7 @@ export const storage = {
       topicId: row.topicId ?? "",
       marketType: row.marketType ?? undefined,
       chainId: row.chainId ?? undefined,
+      cutoffAt: row.cutoffAt ?? undefined,
       updatedAt: row.updatedAt,
     };
   },
